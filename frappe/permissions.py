@@ -334,7 +334,7 @@ def has_user_permission(doc, user=None, debug=False):
 
 	# don't apply strict user permissions for single doctypes since they contain empty link fields
 	apply_strict_user_permissions = (
-		False if doc.meta.issingle else frappe.get_system_settings("apply_strict_user_permissions")
+		False if doc.meta.issingle else frappe.db.get_value("User", user, "apply_strict_user_permissions")
 	)
 	if apply_strict_user_permissions:
 		debug and _debug_log("Strict user permissions will be applied")

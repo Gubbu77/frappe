@@ -1015,7 +1015,7 @@ class DatabaseQuery:
 
 			if user_permission_values:
 				docs = []
-				if frappe.get_system_settings("apply_strict_user_permissions"):
+				if frappe.db.get_value("User", frappe.session.user, "apply_strict_user_permissions"):
 					condition = ""
 				else:
 					empty_value_condition = cast_name(

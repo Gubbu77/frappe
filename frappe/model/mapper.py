@@ -66,8 +66,7 @@ def get_mapped_doc(
 	ignore_child_tables=False,
 	cached=False,
 ):
-	apply_strict_user_permissions = frappe.get_system_settings("apply_strict_user_permissions")
-
+	apply_strict_user_permissions = frappe.db.get_value("User", frappe.session.user, "apply_strict_user_permissions")
 	# main
 	if not target_doc:
 		target_doctype = table_maps[from_doctype]["doctype"]
