@@ -26,9 +26,10 @@
   "currency_precision",
   "rounding_method",
   "permissions",
-  "apply_strict_user_permissions",
   "column_break_21",
   "allow_older_web_view_links",
+  "column_break_yuvf",
+  "apply_strict_user_permissions",
   "security_tab",
   "security",
   "session_expiry",
@@ -220,6 +221,7 @@
    "description": "If Apply Strict User Permission is checked and User Permission is defined for a DocType for a User, then all the documents where value of the link is blank, will not be shown to that User",
    "fieldname": "apply_strict_user_permissions",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Apply Strict User Permissions"
   },
   {
@@ -692,12 +694,16 @@
    "fieldtype": "Link",
    "label": "Currency",
    "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_yuvf",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-cog",
  "issingle": 1,
  "links": [],
- "modified": "2024-11-04 15:51:39.954876",
+ "modified": "2024-11-27 00:33:01.115484",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "System Settings",
