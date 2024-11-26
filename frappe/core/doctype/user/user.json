@@ -34,6 +34,8 @@
   "modules_html",
   "block_modules",
   "home_settings",
+  "permissions_section",
+  "apply_strict_user_permissions",
   "short_bio",
   "gender",
   "birth_date",
@@ -825,6 +827,19 @@
    "fieldname": "dashboard",
    "fieldtype": "Check",
    "label": "Dashboard"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "permissions_section",
+   "fieldtype": "Section Break",
+   "label": "Permissions"
+  },
+  {
+   "default": "0",
+   "description": "If Apply Strict User Permission is checked and User Permission is defined for a DocType for this User, then all the documents where value of the link is blank, will not be shown to this User",
+   "fieldname": "apply_strict_user_permissions",
+   "fieldtype": "Check",
+   "label": "Apply Strict User Permissions"
   }
  ],
  "icon": "fa fa-user",
@@ -887,7 +902,7 @@
    "link_fieldname": "user"
   }
  ],
- "modified": "2024-09-27 11:41:13.336662",
+ "modified": "2024-11-27 00:23:36.345399",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",

@@ -67,6 +67,7 @@ class User(Document):
 		allowed_in_mentions: DF.Check
 		api_key: DF.Data | None
 		api_secret: DF.Password | None
+		apply_strict_user_permissions: DF.Check
 		banner_image: DF.AttachImage | None
 		bio: DF.SmallText | None
 		birth_date: DF.Date | None
