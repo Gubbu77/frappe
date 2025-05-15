@@ -717,7 +717,7 @@ class BaseDocument:
 				doc.db_update()
 
 	def show_unique_validation_message(self, e):
-		if frappe.db.db_type != "postgres":
+		if frappe.db.db_type == "mariadb":
 			fieldname = str(e).split("'")[-2]
 			label = None
 
@@ -1371,11 +1371,11 @@ class BaseDocument:
 	def cast(self, value, df):
 		return cast_fieldtype(df.fieldtype, value, show_warning=False)
 
-	def _extract_images_from_editor(self):
+	def _extract_images_from_text_editor(self):
 		from frappe.core.doctype.file.utils import extract_images_from_doc
 
 		if self.doctype != "DocType":
-			for df in self.meta.get("fields", {"fieldtype": ("in", ("Text Editor", "HTML Editor"))}):
+			for df in self.meta.get("fields", {"fieldtype": ("=", "Text Editor")}):
 				extract_images_from_doc(self, df.fieldname)
 
 

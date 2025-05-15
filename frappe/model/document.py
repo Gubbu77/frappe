@@ -231,12 +231,15 @@ class Document(BaseDocument, DocRef):
 			self._fix_numeric_types()
 
 		else:
-			if not is_doctype and isinstance(self.name, str):
+			if not is_doctype and isinstance(self.name, str | int):
+				for_update = ""
+				if self.flags.for_update and frappe.db.db_type != "sqlite":
+					for_update = "FOR UPDATE"
 				# Fast path - use raw SQL to avoid QB/ORM overheads.
 				d = frappe.db.sql(
 					"SELECT * FROM {table_name} WHERE `name` = %s {for_update}".format(
 						table_name=get_table_name(self.doctype, wrap_in_backticks=True),
-						for_update="FOR UPDATE" if self.flags.for_update else "",
+						for_update=for_update,
 					),
 					(self.name),
 					as_dict=True,
@@ -289,6 +292,9 @@ class Document(BaseDocument, DocRef):
 					for_update=self.flags.for_update,
 				)
 			else:
+				for_update = ""
+				if self.flags.for_update and frappe.db.db_type != "sqlite":
+					for_update = "FOR UPDATE"
 				# Fast pass for all other doctypes - using raw SQL
 				children = frappe.db.sql(
 					"""SELECT * FROM {table_name}
@@ -297,9 +303,9 @@ class Document(BaseDocument, DocRef):
 						AND `parentfield`= %(parentfield)s
 					ORDER BY `idx` ASC {for_update}""".format(
 						table_name=get_table_name(child_doctype, wrap_in_backticks=True),
-						for_update="FOR UPDATE" if self.flags.for_update else "",
+						for_update=for_update,
 					),
-					{"parent": self.name, "parenttype": self.doctype, "parentfield": fieldname},
+					{"parent": str(self.name), "parenttype": self.doctype, "parentfield": fieldname},
 					as_dict=True,
 				)
 
@@ -587,7 +593,7 @@ class Document(BaseDocument, DocRef):
 			tbl = frappe.qb.DocType(df.options)
 			qry = (
 				frappe.qb.from_(tbl)
-				.where(tbl.parent == self.name)
+				.where(tbl.parent == str(self.name))
 				.where(tbl.parenttype == self.doctype)
 				.where(tbl.parentfield == fieldname)
 				.delete()
@@ -640,7 +646,7 @@ class Document(BaseDocument, DocRef):
 	def set_new_name(self, force=False, set_name=None, set_child_names=True):
 		"""Calls `frappe.naming.set_new_name` for parent and child docs."""
 
-		if self.flags.name_set and not force:
+		if (frappe.flags.api_name_set or self.flags.name_set) and not force:
 			return
 
 		autoname = self.meta.autoname or ""
@@ -740,7 +746,7 @@ class Document(BaseDocument, DocRef):
 		self._fix_rating_value()
 		self._validate_code_fields()
 		self._sync_autoname_field()
-		self._extract_images_from_editor()
+		self._extract_images_from_text_editor()
 		self._sanitize_content()
 		self._save_passwords()
 		self.validate_workflow()
@@ -753,7 +759,7 @@ class Document(BaseDocument, DocRef):
 			d._fix_rating_value()
 			d._validate_code_fields()
 			d._sync_autoname_field()
-			d._extract_images_from_editor()
+			d._extract_images_from_text_editor()
 			d._sanitize_content()
 			d._save_passwords()
 		if self.is_new():
@@ -1690,16 +1696,20 @@ class Document(BaseDocument, DocRef):
 		else:
 			return []
 
+	@property
+	def __onload(self):
+		onload = self.get("__onload")
+		if onload is None:
+			onload = frappe._dict()
+			self.set("__onload", onload)
+
+		return onload
+
 	def set_onload(self, key, value):
-		if not self.get("__onload"):
-			self.set("__onload", frappe._dict())
-		self.get("__onload")[key] = value
+		self.__onload[key] = value
 
 	def get_onload(self, key=None):
-		if not key:
-			return self.get("__onload", frappe._dict())
-
-		return self.get("__onload")[key]
+		return self.__onload[key] if key else self.__onload
 
 	def queue_action(self, action, **kwargs):
 		"""Run an action in background. If the action has an inner function,
