@@ -7,8 +7,6 @@ from frappe import _
 from frappe.utils.data import sbool
 
 
-
-
 def document_list(doctype: str):
 	if frappe.form_dict.get("fields"):
 		frappe.form_dict["fields"] = json.loads(frappe.form_dict["fields"])
